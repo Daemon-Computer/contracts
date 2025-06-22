@@ -1,0 +1,54 @@
+name: Smart Contracts Testing
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+      - testnet
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Restore cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/bin/
+            ~/.cargo/registry/index/
+            ~/.cargo/registry/cache/
+            ~/.cargo/git/db/
+            target/
+          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: stable
+
+      - name: Cache Sui installation
+        id: cache-sui
+        uses: actions/cache@v4
+        with:
+          path: ~/.cargo/bin/sui
+          key: ${{ runner.os }}-sui-testnet-${{ hashFiles('.github/workflows/*.yml') }}
+          restore-keys: |
+            ${{ runner.os }}-sui-testnet-
+
+      - name: Install Sui CLI
+        if: steps.cache-sui.outputs.cache-hit != 'true'
+        run: |
+          cargo install --locked --git https://github.com/MystenLabs/sui.git --branch testnet --features tracing sui
+
+      - name: Verify Sui installation
+        run: |
+          sui --version
+          which sui
+
+      - name: Run Sui Move tests
+        run: |
+          sui move test
