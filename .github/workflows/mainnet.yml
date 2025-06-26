@@ -1,0 +1,60 @@
+name: Smart Contracts Testing
+on:
+  pull_request:
+    branches:
+      - mainnet
+  push:
+    branches:
+      - mainnet
+
+jobs:
+  test:
+    name: Test Contracts
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: stable
+
+      - name: Install Sui CLI
+        uses: baptiste0928/cargo-install@v3
+        with:
+          crate: sui
+          git: https://github.com/MystenLabs/sui.git
+          branch: mainnet
+          features: tracing
+
+      - name: Run Sui Move tests
+        run: |
+          sui move test
+
+  lint:
+    name: Lint Contracts
+    needs: test
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: stable
+
+      - name: Install Sui CLI
+        uses: baptiste0928/cargo-install@v3
+        with:
+          crate: sui
+          git: https://github.com/MystenLabs/sui.git
+          branch: mainnet
+          features: tracing
+
+      - name: Run Sui Move lints
+        run: |
+          sui move build --lint --warnings-are-errors
