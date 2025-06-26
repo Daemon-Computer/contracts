@@ -37,6 +37,7 @@ jobs:
 
   lint:
     name: Lint Contracts
+    needs: test
     runs-on: ubuntu-latest
 
     steps:
