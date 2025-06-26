@@ -4,6 +4,10 @@ on:
     branches:
       - main
       - testnet
+  push:
+    branches:
+      - main
+      - testnet
 
 jobs:
   test:
