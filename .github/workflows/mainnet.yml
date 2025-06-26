@@ -1,7 +1,6 @@
 name: Smart Contracts Testing
 on:
   pull_request:
-  push:
     branches:
       - mainnet
 
