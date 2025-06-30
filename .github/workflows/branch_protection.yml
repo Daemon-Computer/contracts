@@ -1,0 +1,21 @@
+name: branch_protection.yml
+on:
+  pull_request:
+
+jobs:
+  protect_testnet:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Protect branch
+        if: github.base_ref == 'testnet' && github.head_ref != 'main'
+        run: |
+          echo "ERROR: You can only merge to testnet from main."
+          exit 1
+  protect_mainnet:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Protect branch
+        if: github.base_ref == 'mainnet' && github.head_ref != 'testnet'
+        run: |
+          echo "ERROR: You can only merge to mainnet from testnet."
+          exit 1
